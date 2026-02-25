@@ -33,9 +33,9 @@ test("header displays app name", async () => {
   expect(headerText).toBe("Electron Lab");
 });
 
-test("all 12 feature cards are present", async () => {
+test("all 13 feature cards are present", async () => {
   const cards = page.locator(".card");
-  await expect(cards).toHaveCount(12);
+  await expect(cards).toHaveCount(13);
 });
 
 test("each card has a number badge", async () => {

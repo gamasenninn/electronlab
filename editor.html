@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-eval'; worker-src blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:"
+    />
+    <title>Monaco Editor</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        font-family: "Segoe UI", -apple-system, sans-serif;
+      }
+
+      #toolbar {
+        display: flex;
+        gap: 8px;
+        padding: 6px 12px;
+        background: #252526;
+        border-bottom: 1px solid #3c3c3c;
+        align-items: center;
+      }
+
+      #toolbar button,
+      #toolbar select {
+        background: #3c3c3c;
+        color: #ccc;
+        border: 1px solid #555;
+        padding: 4px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      #toolbar button:hover {
+        background: #505050;
+      }
+
+      #editor-container {
+        position: absolute;
+        top: 40px;
+        bottom: 28px;
+        left: 0;
+        right: 0;
+      }
+
+      #statusbar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 28px;
+        background: #007acc;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-size: 12px;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toolbar">
+      <button id="btn-editor-open-file">Open File...</button>
+      <button id="btn-editor-save">Save</button>
+      <select id="language-select">
+        <option value="plaintext">Plain Text</option>
+        <option value="javascript">JavaScript</option>
+        <option value="typescript">TypeScript</option>
+        <option value="python">Python</option>
+        <option value="json">JSON</option>
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
+        <option value="markdown">Markdown</option>
+      </select>
+    </div>
+    <div id="editor-container"></div>
+    <div id="statusbar"><span id="editor-status">Ready</span></div>
+
+    <script src="node_modules/monaco-editor/min/vs/loader.js"></script>
+    <script src="editor-renderer.js"></script>
+  </body>
+</html>

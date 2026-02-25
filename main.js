@@ -18,6 +18,7 @@ const os = require("os");
 let mainWindow;
 let tray = null;
 let browserWindow = null;
+let editorWindow = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -289,6 +290,35 @@ ipcMain.handle("browser:getDom", async () => {
   } catch (err) {
     return { success: false, error: err.message };
   }
+});
+
+// #15 Monaco Editor
+ipcMain.handle("editor:open", () => {
+  if (editorWindow && !editorWindow.isDestroyed()) {
+    editorWindow.close();
+  }
+
+  editorWindow = new BrowserWindow({
+    width: 1000,
+    height: 700,
+    parent: mainWindow,
+    modal: false,
+    title: "Monaco Editor",
+    backgroundColor: "#1e1e1e",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  editorWindow.loadFile("editor.html");
+
+  editorWindow.on("closed", () => {
+    editorWindow = null;
+  });
+
+  return { id: editorWindow.id };
 });
 
 // #10 Screen Capture

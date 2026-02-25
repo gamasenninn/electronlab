@@ -32,6 +32,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // Screen Capture
   captureScreen: () => ipcRenderer.invoke("capture:screen"),
 
+  // Monaco Editor
+  openEditor: () => ipcRenderer.invoke("editor:open"),
+
   // Menu action listener
   onMenuAction: (callback) =>
     ipcRenderer.on("menu-action", (_, message) => callback(message)),

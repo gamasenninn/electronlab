@@ -194,6 +194,16 @@ $("btn-browser-open").addEventListener("click", async () => {
   }
 });
 
+// #15 Monaco Editor
+$("btn-editor-open").addEventListener("click", async () => {
+  try {
+    const result = await api.openEditor();
+    setResult("result-editor", `Editor opened (ID: ${result.id})`);
+  } catch (err) {
+    setResult("result-editor", `Error: ${err.message}`);
+  }
+});
+
 $("btn-browser-dom").addEventListener("click", async () => {
   const result = await api.getBrowserDom();
   if (result.success) {
