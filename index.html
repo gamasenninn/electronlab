@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <title>Electron Lab</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", -apple-system, sans-serif;
+        background: #1a1a2e;
+        color: #e0e0e0;
+        min-height: 100vh;
+      }
+
+      header {
+        background: #16213e;
+        padding: 20px 32px;
+        border-bottom: 2px solid #0f3460;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      header h1 {
+        font-size: 24px;
+        color: #e94560;
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
+
+      header .subtitle {
+        color: #888;
+        font-size: 14px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 24px auto;
+        padding: 0 24px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 20px;
+      }
+
+      .card {
+        background: #16213e;
+        border: 1px solid #0f3460;
+        border-radius: 10px;
+        padding: 20px;
+        transition: border-color 0.2s;
+      }
+
+      .card:hover {
+        border-color: #e94560;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .card-number {
+        background: #e94560;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #fff;
+      }
+
+      .card-api {
+        font-size: 11px;
+        color: #e94560;
+        background: rgba(233, 69, 96, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-family: monospace;
+      }
+
+      .card-body {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      button {
+        background: #0f3460;
+        color: #e0e0e0;
+        border: 1px solid #1a4a8a;
+        padding: 7px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.15s;
+      }
+
+      button:hover {
+        background: #e94560;
+        border-color: #e94560;
+        color: #fff;
+      }
+
+      button:active {
+        transform: scale(0.97);
+      }
+
+      .result {
+        background: #0d1b2a;
+        border: 1px solid #1b2838;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 12px;
+        font-family: "Cascadia Code", "Consolas", monospace;
+        color: #8bc6ec;
+        max-height: 200px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        min-height: 36px;
+        line-height: 1.5;
+      }
+
+      .result:empty::before {
+        content: "Result will appear here...";
+        color: #444;
+      }
+
+      .result img {
+        max-width: 100%;
+        border-radius: 4px;
+        margin-top: 4px;
+      }
+
+      input[type="text"],
+      textarea {
+        background: #0d1b2a;
+        color: #e0e0e0;
+        border: 1px solid #1b2838;
+        padding: 7px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: inherit;
+        width: 100%;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 60px;
+      }
+
+      input[type="text"]:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #e94560;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .input-row input {
+        flex: 1;
+      }
+
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #0d1b2a;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #0f3460;
+        border-radius: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Electron Lab</h1>
+      <span class="subtitle">Electron API Playground</span>
+    </header>
+
+    <div class="container">
+      <!-- #1 Window Info -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">1</div>
+          <span class="card-title">Window Info</span>
+          <span class="card-api">BrowserWindow</span>
+        </div>
+        <div class="card-body">
+          <div class="card-actions">
+            <button id="btn-window-info">Get Window Info</button>
+          </div>
+          <div class="result" id="result-window"></div>
+        </div>
+      </div>
+
+      <!-- #2 Dialogs -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">2</div>
+          <span class="card-title">Dialogs</span>
+          <span class="card-api">dialog</span>
+        </div>
+        <div class="card-body">
+          <div class="card-actions">
+            <button id="btn-dialog-open">Open File</button>
+            <button id="btn-dialog-save">Save File</button>
+            <button id="btn-dialog-msg">Message Box</button>
+          </div>
+          <div class="result" id="result-dialog"></div>
+        </div>
+      </div>
+
+      <!-- #3 Clipboard -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">3</div>
+          <span class="card-title">Clipboard</span>
+          <span class="card-api">clipboard</span>
+        </div>
+        <div class="card-body">
+          <div class="input-row">
+            <input type="text" id="clipboard-input" placeholder="Text to copy..." />
+            <button id="btn-clipboard-write">Copy</button>
+          </div>
+          <div class="card-actions">
+            <button id="btn-clipboard-read">Read Clipboard</button>
+          </div>
+          <div class="result" id="result-clipboard"></div>
+        </div>
+      </div>
+
+      <!-- #4 Notification -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">4</div>
+          <span class="card-title">Desktop Notification</span>
+          <span class="card-api">Notification</span>
+        </div>
+        <div class="card-body">
+          <input type="text" id="notif-title" placeholder="Notification title" value="Hello!" />
+          <input type="text" id="notif-body" placeholder="Notification body" value="This is a desktop notification from Electron." />
+          <div class="card-actions">
+            <button id="btn-notif">Send Notification</button>
+          </div>
+          <div class="result" id="result-notif"></div>
+        </div>
+      </div>
+
+      <!-- #5 System Info -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">5</div>
+          <span class="card-title">System Info</span>
+          <span class="card-api">process, os, app</span>
+        </div>
+        <div class="card-body">
+          <div class="card-actions">
+            <button id="btn-sysinfo">Get System Info</button>
+          </div>
+          <div class="result" id="result-sysinfo"></div>
+        </div>
+      </div>
+
+      <!-- #6 Custom Menu -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">6</div>
+          <span class="card-title">Custom Menu</span>
+          <span class="card-api">Menu</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px;color:#888;">
+            Check the application menu bar above. It includes custom items
+            like File > Open File (Ctrl+O) and Help > About.
+          </p>
+          <div class="result" id="result-menu"></div>
+        </div>
+      </div>
+
+      <!-- #7 System Tray -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">7</div>
+          <span class="card-title">System Tray</span>
+          <span class="card-api">Tray</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px;color:#888;">
+            A tray icon is active in your system tray.
+            Right-click it to see the context menu with "Show Window"
+            and "Notification Test" options.
+          </p>
+          <div class="result" id="result-tray">Tray icon is running. Check your system tray!</div>
+        </div>
+      </div>
+
+      <!-- #8 File I/O -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">8</div>
+          <span class="card-title">File Read / Write</span>
+          <span class="card-api">fs via IPC</span>
+        </div>
+        <div class="card-body">
+          <div class="card-actions">
+            <button id="btn-file-read">Read File...</button>
+            <button id="btn-file-write">Write Test File</button>
+          </div>
+          <div class="result" id="result-file"></div>
+        </div>
+      </div>
+
+      <!-- #9 Child Window -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">9</div>
+          <span class="card-title">Child Window</span>
+          <span class="card-api">BrowserWindow (child)</span>
+        </div>
+        <div class="card-body">
+          <div class="card-actions">
+            <button id="btn-child-window">Open Child Window</button>
+          </div>
+          <div class="result" id="result-child"></div>
+        </div>
+      </div>
+
+      <!-- #10 Screen Capture -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">10</div>
+          <span class="card-title">Screen Capture</span>
+          <span class="card-api">desktopCapturer</span>
+        </div>
+        <div class="card-body">
+          <div class="card-actions">
+            <button id="btn-capture">Capture Screens</button>
+          </div>
+          <div class="result" id="result-capture"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
