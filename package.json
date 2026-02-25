@@ -6,7 +6,8 @@
     "start": "electron .",
     "test": "npx playwright test",
     "test:headed": "npx playwright test --headed",
-    "test:report": "npx playwright show-report"
+    "test:report": "npx playwright show-report",
+    "docs": "npx playwright test docs/generate-docs.spec.js --config docs/playwright.docs.config.js"
   },
   "keywords": [],
   "author": "",
