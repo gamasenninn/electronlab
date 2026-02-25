@@ -57,6 +57,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
   shellShowItemInFolder: (filePath) =>
     ipcRenderer.invoke("shell:showItemInFolder", filePath),
 
+  // SQLite Database
+  dbOpen: (filePath) => ipcRenderer.invoke("db:open", filePath),
+  dbClose: () => ipcRenderer.invoke("db:close"),
+  dbExecute: (sql) => ipcRenderer.invoke("db:execute", sql),
+  dbTables: () => ipcRenderer.invoke("db:tables"),
+  dbOpenConsole: () => ipcRenderer.invoke("db:openConsole"),
+
   // Menu action listener
   onMenuAction: (callback) =>
     ipcRenderer.on("menu-action", (_, message) => callback(message)),

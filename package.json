@@ -13,10 +13,12 @@
   "license": "ISC",
   "description": "Electron Lab - Electron API demo app",
   "devDependencies": {
+    "@electron/rebuild": "^4.0.3",
     "@playwright/test": "^1.58.2",
     "electron": "^40.6.1"
   },
   "dependencies": {
+    "better-sqlite3": "^12.6.2",
     "monaco-editor": "^0.55.1"
   }
 }

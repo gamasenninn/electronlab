@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <title>SQL Console</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        background: #1a1a2e;
+        color: #e0e0e0;
+        font-family: "Segoe UI", -apple-system, sans-serif;
+      }
+
+      #toolbar {
+        display: flex;
+        gap: 8px;
+        padding: 8px 12px;
+        background: #16213e;
+        border-bottom: 1px solid #0f3460;
+        align-items: center;
+      }
+
+      #toolbar button {
+        background: #0f3460;
+        color: #e0e0e0;
+        border: 1px solid #1a4a8a;
+        padding: 5px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      #toolbar button:hover {
+        background: #e94560;
+        border-color: #e94560;
+        color: #fff;
+      }
+
+      #db-status {
+        margin-left: auto;
+        font-size: 12px;
+        color: #8bc6ec;
+        font-family: "Cascadia Code", "Consolas", monospace;
+      }
+
+      #sql-area {
+        padding: 12px;
+      }
+
+      #sql-input {
+        width: 100%;
+        height: 100px;
+        background: #0d1b2a;
+        color: #e0e0e0;
+        border: 1px solid #1b2838;
+        border-radius: 6px;
+        padding: 8px 10px;
+        font-family: "Cascadia Code", "Consolas", monospace;
+        font-size: 13px;
+        resize: vertical;
+      }
+
+      #sql-input:focus {
+        outline: none;
+        border-color: #e94560;
+      }
+
+      #button-row {
+        display: flex;
+        gap: 8px;
+        padding: 0 12px 8px;
+      }
+
+      #button-row button {
+        background: #0f3460;
+        color: #e0e0e0;
+        border: 1px solid #1a4a8a;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      #button-row button:hover {
+        background: #e94560;
+        border-color: #e94560;
+        color: #fff;
+      }
+
+      #sql-result {
+        margin: 0 12px;
+        background: #0d1b2a;
+        border: 1px solid #1b2838;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 12px;
+        font-family: "Cascadia Code", "Consolas", monospace;
+        color: #8bc6ec;
+        overflow: auto;
+        flex: 1;
+        min-height: 100px;
+      }
+
+      #sql-result table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      #sql-result th,
+      #sql-result td {
+        border: 1px solid #1b2838;
+        padding: 4px 8px;
+        text-align: left;
+        font-size: 12px;
+      }
+
+      #sql-result th {
+        background: #16213e;
+        color: #e94560;
+      }
+
+      #sql-result td {
+        color: #e0e0e0;
+      }
+
+      #statusbar {
+        padding: 6px 12px;
+        background: #16213e;
+        border-top: 1px solid #0f3460;
+        font-size: 12px;
+        color: #888;
+      }
+
+      #sql-status {
+        color: #8bc6ec;
+      }
+
+      .layout {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <div id="toolbar">
+        <button id="btn-db-open">Open DB</button>
+        <button id="btn-db-close">Close DB</button>
+        <span id="db-status">No database connected</span>
+      </div>
+      <div id="sql-area">
+        <textarea id="sql-input">SELECT sqlite_version();</textarea>
+      </div>
+      <div id="button-row">
+        <button id="btn-sql-execute">Execute</button>
+        <button id="btn-sql-tables">List Tables</button>
+      </div>
+      <div id="sql-result"></div>
+      <div id="statusbar">
+        <span id="sql-status">Ready</span>
+      </div>
+    </div>
+
+    <script src="sqlite-renderer.js"></script>
+  </body>
+</html>

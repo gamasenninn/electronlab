@@ -18,10 +18,15 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 
+const Database = require("better-sqlite3");
+
 let mainWindow;
 let tray = null;
 let browserWindow = null;
 let editorWindow = null;
+let sqliteWindow = null;
+let currentDb = null;
+let currentDbPath = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -460,6 +465,101 @@ ipcMain.handle("net:isOnline", () => {
   return { online: net.isOnline() };
 });
 
+// #17 SQLite Database
+ipcMain.handle("db:open", (_, filePath) => {
+  try {
+    if (currentDb) {
+      currentDb.close();
+    }
+    currentDb = new Database(filePath);
+    currentDbPath = filePath;
+    return { success: true, path: filePath };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("db:close", () => {
+  try {
+    if (currentDb) {
+      currentDb.close();
+      currentDb = null;
+      currentDbPath = null;
+    }
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("db:execute", (_, sql) => {
+  try {
+    if (!currentDb) {
+      return { success: false, error: "No database is open." };
+    }
+    const trimmed = sql.trim().toUpperCase();
+    if (
+      trimmed.startsWith("SELECT") ||
+      trimmed.startsWith("PRAGMA") ||
+      trimmed.startsWith("EXPLAIN")
+    ) {
+      const stmt = currentDb.prepare(sql);
+      const rows = stmt.all();
+      const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+      return { success: true, columns, rows };
+    } else {
+      const stmt = currentDb.prepare(sql);
+      const info = stmt.run();
+      return { success: true, changes: info.changes };
+    }
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("db:tables", () => {
+  try {
+    if (!currentDb) {
+      return { success: false, error: "No database is open." };
+    }
+    const rows = currentDb
+      .prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+      .all();
+    const tables = rows.map((r) => r.name);
+    return { success: true, tables };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("db:openConsole", () => {
+  if (sqliteWindow && !sqliteWindow.isDestroyed()) {
+    sqliteWindow.close();
+  }
+
+  sqliteWindow = new BrowserWindow({
+    width: 900,
+    height: 600,
+    parent: mainWindow,
+    modal: false,
+    title: "SQL Console",
+    backgroundColor: "#1a1a2e",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  sqliteWindow.loadFile("sqlite.html");
+
+  sqliteWindow.on("closed", () => {
+    sqliteWindow = null;
+  });
+
+  return { id: sqliteWindow.id };
+});
+
 // =========== App Lifecycle ===========
 
 app.whenReady().then(() => {
@@ -474,6 +574,10 @@ app.whenReady().then(() => {
 
 app.on("will-quit", () => {
   globalShortcut.unregisterAll();
+  if (currentDb) {
+    currentDb.close();
+    currentDb = null;
+  }
 });
 
 app.on("window-all-closed", () => {

@@ -4,3 +4,4 @@ test-results/
 playwright-report/
 tests/e2e/fixtures/temp/*
 !tests/e2e/fixtures/temp/.gitkeep
+*.db

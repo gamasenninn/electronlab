@@ -347,6 +347,32 @@ $("btn-editor-open").addEventListener("click", async () => {
   }
 });
 
+// #17 SQLite Database
+$("btn-db-open").addEventListener("click", async () => {
+  const dialogResult = await api.openFileDialog();
+  if (dialogResult.canceled) {
+    setResult("result-sqlite", "File selection canceled.");
+    return;
+  }
+  const filePath = dialogResult.filePaths[0];
+  const result = await api.dbOpen(filePath);
+  if (result.success) {
+    const fileName = filePath.split(/[\\/]/).pop();
+    setResult("result-sqlite", `Connected: ${fileName}`);
+  } else {
+    setResult("result-sqlite", `Error: ${result.error}`);
+  }
+});
+
+$("btn-db-console").addEventListener("click", async () => {
+  try {
+    const result = await api.dbOpenConsole();
+    setResult("result-sqlite", `Console opened (ID: ${result.id})`);
+  } catch (err) {
+    setResult("result-sqlite", `Error: ${err.message}`);
+  }
+});
+
 $("btn-browser-dom").addEventListener("click", async () => {
   const result = await api.getBrowserDom();
   if (result.success) {
