@@ -1,4 +1,5 @@
 node_modules/
+.claude/
 test-results/
 playwright-report/
 tests/e2e/fixtures/temp/*
