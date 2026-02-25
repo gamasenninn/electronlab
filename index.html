@@ -423,6 +423,47 @@
           <div class="result" id="result-browser"></div>
         </div>
       </div>
+      <!-- #13 Shortcuts -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">13</div>
+          <span class="card-title">Shortcuts</span>
+          <span class="card-api">globalShortcut</span>
+        </div>
+        <div class="card-body">
+          <div class="input-row">
+            <input type="text" id="shortcut-input" placeholder="e.g. CmdOrCtrl+Shift+X" value="CmdOrCtrl+Shift+X" />
+          </div>
+          <div class="card-actions">
+            <button id="btn-shortcut-register">Register</button>
+            <button id="btn-shortcut-unregister">Unregister</button>
+            <button id="btn-shortcut-unregisterall">Unregister All</button>
+            <button id="btn-shortcut-getall">Get All</button>
+          </div>
+          <div class="result" id="result-shortcut"></div>
+        </div>
+      </div>
+
+      <!-- #14 Shell Integration -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">14</div>
+          <span class="card-title">Shell Integration</span>
+          <span class="card-api">shell</span>
+        </div>
+        <div class="card-body">
+          <div class="input-row">
+            <input type="text" id="shell-url" placeholder="https://example.com" value="https://example.com" />
+            <button id="btn-shell-open-url">Open in Browser</button>
+          </div>
+          <div class="card-actions">
+            <button id="btn-shell-open-folder">Open Folder</button>
+            <button id="btn-shell-show-folder">Show in Folder</button>
+          </div>
+          <div class="result" id="result-shell"></div>
+        </div>
+      </div>
+
       <!-- #15 Monaco Editor -->
       <div class="card">
         <div class="card-header">

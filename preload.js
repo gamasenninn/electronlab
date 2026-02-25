@@ -35,6 +35,24 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // Monaco Editor
   openEditor: () => ipcRenderer.invoke("editor:open"),
 
+  // Shortcuts
+  registerShortcut: (accelerator) =>
+    ipcRenderer.invoke("shortcut:register", accelerator),
+  unregisterShortcut: (accelerator) =>
+    ipcRenderer.invoke("shortcut:unregister", accelerator),
+  unregisterAllShortcuts: () => ipcRenderer.invoke("shortcut:unregisterAll"),
+  getAllShortcuts: () => ipcRenderer.invoke("shortcut:getAll"),
+  onShortcutTriggered: (callback) =>
+    ipcRenderer.on("shortcut:triggered", (_, accelerator) =>
+      callback(accelerator)
+    ),
+
+  // Shell Integration
+  shellOpenExternal: (url) => ipcRenderer.invoke("shell:openExternal", url),
+  shellOpenPath: (filePath) => ipcRenderer.invoke("shell:openPath", filePath),
+  shellShowItemInFolder: (filePath) =>
+    ipcRenderer.invoke("shell:showItemInFolder", filePath),
+
   // Menu action listener
   onMenuAction: (callback) =>
     ipcRenderer.on("menu-action", (_, message) => callback(message)),

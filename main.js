@@ -10,6 +10,8 @@ const {
   nativeImage,
   desktopCapturer,
   screen,
+  globalShortcut,
+  shell,
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -339,6 +341,79 @@ ipcMain.handle("capture:screen", async () => {
   }
 });
 
+// #13 Shortcuts (globalShortcut)
+const registeredShortcuts = new Set();
+
+ipcMain.handle("shortcut:register", (_, accelerator) => {
+  try {
+    const ret = globalShortcut.register(accelerator, () => {
+      mainWindow.webContents.send("shortcut:triggered", accelerator);
+    });
+    if (ret) {
+      registeredShortcuts.add(accelerator);
+      return { success: true };
+    }
+    return { success: false, error: "Registration failed" };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("shortcut:unregister", (_, accelerator) => {
+  try {
+    globalShortcut.unregister(accelerator);
+    registeredShortcuts.delete(accelerator);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("shortcut:unregisterAll", () => {
+  globalShortcut.unregisterAll();
+  registeredShortcuts.clear();
+  return { success: true };
+});
+
+ipcMain.handle("shortcut:getAll", () => {
+  return { shortcuts: Array.from(registeredShortcuts) };
+});
+
+// #14 Shell Integration
+ipcMain.handle("shell:openExternal", async (_, url) => {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return { success: false, error: "Protocol not allowed. Only http and https are permitted." };
+    }
+    await shell.openExternal(url);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("shell:openPath", async (_, filePath) => {
+  try {
+    const errorMessage = await shell.openPath(filePath);
+    if (errorMessage) {
+      return { success: false, error: errorMessage };
+    }
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("shell:showItemInFolder", (_, filePath) => {
+  try {
+    shell.showItemInFolder(filePath);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
 // =========== App Lifecycle ===========
 
 app.whenReady().then(() => {
@@ -349,6 +424,10 @@ app.whenReady().then(() => {
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+});
+
+app.on("will-quit", () => {
+  globalShortcut.unregisterAll();
 });
 
 app.on("window-all-closed", () => {

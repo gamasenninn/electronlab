@@ -194,6 +194,102 @@ $("btn-browser-open").addEventListener("click", async () => {
   }
 });
 
+// #13 Shortcuts
+$("btn-shortcut-register").addEventListener("click", async () => {
+  const accelerator = $("shortcut-input").value.trim();
+  if (!accelerator) {
+    setResult("result-shortcut", "Please enter a shortcut key combination.");
+    return;
+  }
+  const result = await api.registerShortcut(accelerator);
+  if (result.success) {
+    setResult("result-shortcut", `Registered: ${accelerator}`);
+  } else {
+    setResult("result-shortcut", `Error: ${result.error}`);
+  }
+});
+
+$("btn-shortcut-unregister").addEventListener("click", async () => {
+  const accelerator = $("shortcut-input").value.trim();
+  if (!accelerator) {
+    setResult("result-shortcut", "Please enter a shortcut key combination.");
+    return;
+  }
+  const result = await api.unregisterShortcut(accelerator);
+  if (result.success) {
+    setResult("result-shortcut", `Unregistered: ${accelerator}`);
+  } else {
+    setResult("result-shortcut", `Error: ${result.error}`);
+  }
+});
+
+$("btn-shortcut-unregisterall").addEventListener("click", async () => {
+  const result = await api.unregisterAllShortcuts();
+  if (result.success) {
+    setResult("result-shortcut", "All unregistered.");
+  } else {
+    setResult("result-shortcut", `Error: ${result.error}`);
+  }
+});
+
+$("btn-shortcut-getall").addEventListener("click", async () => {
+  const result = await api.getAllShortcuts();
+  if (result.shortcuts.length === 0) {
+    setResult("result-shortcut", "No shortcuts registered.");
+  } else {
+    setResult("result-shortcut", `Registered shortcuts:\n${result.shortcuts.join("\n")}`);
+  }
+});
+
+api.onShortcutTriggered((accelerator) => {
+  setResult("result-shortcut", `Triggered: ${accelerator}`);
+});
+
+// #14 Shell Integration
+$("btn-shell-open-url").addEventListener("click", async () => {
+  const url = $("shell-url").value.trim();
+  if (!url) {
+    setResult("result-shell", "Please enter a URL.");
+    return;
+  }
+  const result = await api.shellOpenExternal(url);
+  if (result.success) {
+    setResult("result-shell", `Opened: ${url}`);
+  } else {
+    setResult("result-shell", `Error: ${result.error}`);
+  }
+});
+
+$("btn-shell-open-folder").addEventListener("click", async () => {
+  const dialogResult = await api.openFileDialog();
+  if (dialogResult.canceled) {
+    setResult("result-shell", "Folder selection canceled.");
+    return;
+  }
+  const folderPath = dialogResult.filePaths[0];
+  const result = await api.shellOpenPath(folderPath);
+  if (result.success) {
+    setResult("result-shell", `Opened: ${folderPath}`);
+  } else {
+    setResult("result-shell", `Error: ${result.error}`);
+  }
+});
+
+$("btn-shell-show-folder").addEventListener("click", async () => {
+  const dialogResult = await api.openFileDialog();
+  if (dialogResult.canceled) {
+    setResult("result-shell", "File selection canceled.");
+    return;
+  }
+  const filePath = dialogResult.filePaths[0];
+  const result = await api.shellShowItemInFolder(filePath);
+  if (result.success) {
+    setResult("result-shell", `Shown in folder: ${filePath}`);
+  } else {
+    setResult("result-shell", `Error: ${result.error}`);
+  }
+});
+
 // #15 Monaco Editor
 $("btn-editor-open").addEventListener("click", async () => {
   try {

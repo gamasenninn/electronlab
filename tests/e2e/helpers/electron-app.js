@@ -82,6 +82,43 @@ async function mockMessageBox(electronApp, responseIndex = 0) {
   }, responseIndex);
 }
 
+/**
+ * Mock shell.openExternal to record calls instead of opening a browser.
+ */
+async function mockShellOpenExternal(electronApp) {
+  await electronApp.evaluate(({ shell }) => {
+    global.__shellOpenExternalCalls = [];
+    shell.openExternal = async (url) => {
+      global.__shellOpenExternalCalls.push(url);
+    };
+  });
+}
+
+/**
+ * Mock shell.openPath to record calls instead of opening files.
+ */
+async function mockShellOpenPath(electronApp) {
+  await electronApp.evaluate(({ shell }) => {
+    global.__shellOpenPathCalls = [];
+    shell.openPath = async (filePath) => {
+      global.__shellOpenPathCalls.push(filePath);
+      return "";
+    };
+  });
+}
+
+/**
+ * Mock shell.showItemInFolder to record calls instead of showing in explorer.
+ */
+async function mockShellShowItemInFolder(electronApp) {
+  await electronApp.evaluate(({ shell }) => {
+    global.__shellShowItemInFolderCalls = [];
+    shell.showItemInFolder = (filePath) => {
+      global.__shellShowItemInFolderCalls.push(filePath);
+    };
+  });
+}
+
 module.exports = {
   launchApp,
   closeApp,
@@ -90,4 +127,7 @@ module.exports = {
   mockSaveDialog,
   mockSaveDialogCancel,
   mockMessageBox,
+  mockShellOpenExternal,
+  mockShellOpenPath,
+  mockShellShowItemInFolder,
 };
