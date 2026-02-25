@@ -19,6 +19,7 @@ const fs = require("fs");
 const os = require("os");
 
 const Database = require("better-sqlite3");
+const pty = require("node-pty");
 
 let mainWindow;
 let tray = null;
@@ -27,6 +28,8 @@ let editorWindow = null;
 let sqliteWindow = null;
 let currentDb = null;
 let currentDbPath = null;
+let terminalWindow = null;
+let terminalPty = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -560,6 +563,81 @@ ipcMain.handle("db:openConsole", () => {
   return { id: sqliteWindow.id };
 });
 
+// #18 Terminal
+ipcMain.handle("terminal:open", () => {
+  if (terminalPty) {
+    terminalPty.kill();
+    terminalPty = null;
+  }
+  if (terminalWindow && !terminalWindow.isDestroyed()) {
+    terminalWindow.close();
+  }
+
+  const shell = process.platform === "win32" ? "powershell.exe" : "bash";
+  terminalPty = pty.spawn(shell, [], {
+    name: "xterm-color",
+    cols: 80,
+    rows: 30,
+    cwd: os.homedir(),
+    env: process.env,
+  });
+
+  global.__terminalPty = terminalPty;
+
+  terminalWindow = new BrowserWindow({
+    width: 800,
+    height: 500,
+    parent: mainWindow,
+    modal: false,
+    title: "Terminal",
+    backgroundColor: "#000000",
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  terminalWindow.loadFile("terminal.html", { query: { shell } });
+
+  terminalPty.onData((data) => {
+    if (terminalWindow && !terminalWindow.isDestroyed()) {
+      terminalWindow.webContents.send("terminal:data", data);
+    }
+  });
+
+  terminalPty.onExit(({ exitCode }) => {
+    if (terminalWindow && !terminalWindow.isDestroyed()) {
+      terminalWindow.webContents.send("terminal:exit", exitCode);
+    }
+    terminalPty = null;
+    global.__terminalPty = null;
+  });
+
+  terminalWindow.on("closed", () => {
+    if (terminalPty) {
+      terminalPty.kill();
+      terminalPty = null;
+      global.__terminalPty = null;
+    }
+    terminalWindow = null;
+  });
+
+  return { id: terminalWindow.id, shell };
+});
+
+ipcMain.on("terminal:input", (_, data) => {
+  if (terminalPty) {
+    terminalPty.write(data);
+  }
+});
+
+ipcMain.on("terminal:resize", (_, { cols, rows }) => {
+  if (terminalPty) {
+    terminalPty.resize(cols, rows);
+  }
+});
+
 // =========== App Lifecycle ===========
 
 app.whenReady().then(() => {
@@ -574,6 +652,10 @@ app.whenReady().then(() => {
 
 app.on("will-quit", () => {
   globalShortcut.unregisterAll();
+  if (terminalPty) {
+    terminalPty.kill();
+    terminalPty = null;
+  }
   if (currentDb) {
     currentDb.close();
     currentDb = null;
