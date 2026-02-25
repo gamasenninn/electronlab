@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:report": "npx playwright show-report"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "Electron Lab - Electron API demo app",
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "electron": "^40.6.1"
   }
 }
