@@ -373,6 +373,16 @@ $("btn-db-console").addEventListener("click", async () => {
   }
 });
 
+// #18 Terminal
+$("btn-terminal-open").addEventListener("click", async () => {
+  try {
+    const result = await api.openTerminal();
+    setResult("result-terminal", `Terminal opened (ID: ${result.id})`);
+  } catch (err) {
+    setResult("result-terminal", `Error: ${err.message}`);
+  }
+});
+
 $("btn-browser-dom").addEventListener("click", async () => {
   const result = await api.getBrowserDom();
   if (result.success) {

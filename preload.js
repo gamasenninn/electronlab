@@ -64,6 +64,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
   dbTables: () => ipcRenderer.invoke("db:tables"),
   dbOpenConsole: () => ipcRenderer.invoke("db:openConsole"),
 
+  // Terminal
+  openTerminal: () => ipcRenderer.invoke("terminal:open"),
+  terminalInput: (data) => ipcRenderer.send("terminal:input", data),
+  terminalResize: (cols, rows) =>
+    ipcRenderer.send("terminal:resize", { cols, rows }),
+  onTerminalData: (cb) =>
+    ipcRenderer.on("terminal:data", (_, data) => cb(data)),
+  onTerminalExit: (cb) =>
+    ipcRenderer.on("terminal:exit", (_, code) => cb(code)),
+
   // Menu action listener
   onMenuAction: (callback) =>
     ipcRenderer.on("menu-action", (_, message) => callback(message)),
