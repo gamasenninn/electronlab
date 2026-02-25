@@ -17,6 +17,7 @@ const os = require("os");
 
 let mainWindow;
 let tray = null;
+let browserWindow = null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -246,6 +247,48 @@ ipcMain.handle("window:openChild", () => {
   );
 
   return { id: child.id };
+});
+
+// #12 Web Browser
+ipcMain.handle("browser:open", (_, url) => {
+  if (browserWindow && !browserWindow.isDestroyed()) {
+    browserWindow.close();
+  }
+
+  browserWindow = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    parent: mainWindow,
+    modal: false,
+    title: "Web Browser",
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+
+  browserWindow.loadURL(url);
+
+  browserWindow.on("closed", () => {
+    browserWindow = null;
+  });
+
+  return { id: browserWindow.id };
+});
+
+ipcMain.handle("browser:getDom", async () => {
+  if (!browserWindow || browserWindow.isDestroyed()) {
+    return { success: false, error: "No browser window is open." };
+  }
+  try {
+    const dom = await browserWindow.webContents.executeJavaScript(
+      "document.documentElement.outerHTML"
+    );
+    return { success: true, dom };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
 });
 
 // #10 Screen Capture

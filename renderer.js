@@ -145,3 +145,64 @@ $("btn-capture").addEventListener("click", async () => {
     .join("");
   setResultHTML("result-capture", html || "No sources found.");
 });
+
+// #11 Drag & Drop
+const dropZone = $("drop-zone");
+
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.classList.add("dragover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", async (e) => {
+  e.preventDefault();
+  dropZone.classList.remove("dragover");
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+
+  const info = `Name: ${file.name}\nSize: ${file.size} bytes\nType: ${file.type || "unknown"}`;
+
+  const filePath = api.getFilePath(file);
+  const result = await api.readFile(filePath);
+  if (result.success) {
+    const preview =
+      result.content.length > 500
+        ? result.content.substring(0, 500) + "\n... (truncated)"
+        : result.content;
+    setResult("result-drop", `${info}\n\n--- Content ---\n${preview}`);
+  } else {
+    setResult("result-drop", `${info}\n\nError reading file: ${result.error}`);
+  }
+});
+
+// #12 Web Browser
+$("btn-browser-open").addEventListener("click", async () => {
+  const url = $("browser-url").value.trim();
+  if (!url) {
+    setResult("result-browser", "Please enter a URL.");
+    return;
+  }
+  try {
+    const result = await api.openBrowser(url);
+    setResult("result-browser", `Browser opened (ID: ${result.id})`);
+  } catch (err) {
+    setResult("result-browser", `Error: ${err.message}`);
+  }
+});
+
+$("btn-browser-dom").addEventListener("click", async () => {
+  const result = await api.getBrowserDom();
+  if (result.success) {
+    const preview =
+      result.dom.length > 2000
+        ? result.dom.substring(0, 2000) + "\n... (truncated)"
+        : result.dom;
+    setResult("result-browser", preview);
+  } else {
+    setResult("result-browser", `Error: ${result.error}`);
+  }
+});

@@ -192,6 +192,24 @@
         flex: 1;
       }
 
+      .drop-zone {
+        border: 2px dashed #0f3460;
+        border-radius: 8px;
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 14px;
+        transition: border-color 0.2s, color 0.2s;
+        cursor: default;
+      }
+
+      .drop-zone.dragover {
+        border-color: #e94560;
+        color: #e94560;
+      }
+
       ::-webkit-scrollbar {
         width: 6px;
       }
@@ -372,6 +390,37 @@
             <button id="btn-capture">Capture Screens</button>
           </div>
           <div class="result" id="result-capture"></div>
+        </div>
+      </div>
+      <!-- #11 Drag & Drop -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">11</div>
+          <span class="card-title">Drag & Drop</span>
+          <span class="card-api">File, fs via IPC</span>
+        </div>
+        <div class="card-body">
+          <div class="drop-zone" id="drop-zone">Drop a file here</div>
+          <div class="result" id="result-drop"></div>
+        </div>
+      </div>
+
+      <!-- #12 Web Browser -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">12</div>
+          <span class="card-title">Web Browser</span>
+          <span class="card-api">BrowserWindow, executeJavaScript</span>
+        </div>
+        <div class="card-body">
+          <div class="input-row">
+            <input type="text" id="browser-url" placeholder="https://example.com" value="https://example.com" />
+            <button id="btn-browser-open">Open</button>
+          </div>
+          <div class="card-actions">
+            <button id="btn-browser-dom">Get DOM</button>
+          </div>
+          <div class="result" id="result-browser"></div>
         </div>
       </div>
     </div>

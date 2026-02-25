@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
 contextBridge.exposeInMainWorld("electronAPI", {
   // Dialog
@@ -25,10 +25,17 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // Child Window
   openChildWindow: () => ipcRenderer.invoke("window:openChild"),
 
+  // Web Browser
+  openBrowser: (url) => ipcRenderer.invoke("browser:open", url),
+  getBrowserDom: () => ipcRenderer.invoke("browser:getDom"),
+
   // Screen Capture
   captureScreen: () => ipcRenderer.invoke("capture:screen"),
 
   // Menu action listener
   onMenuAction: (callback) =>
     ipcRenderer.on("menu-action", (_, message) => callback(message)),
+
+  // File utilities
+  getFilePath: (file) => webUtils.getPathForFile(file),
 });

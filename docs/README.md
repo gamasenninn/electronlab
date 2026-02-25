@@ -4,7 +4,7 @@ Electronの基本機能を一通り試せるインタラクティブなデモア
 
 ## 概要
 
-Electron Labは、Electronが提供する主要APIを実際に操作しながら学べるPlaygroundアプリです。ダークテーマのカード形式UIで、10種類の機能をボタンクリックで試すことができます。
+Electron Labは、Electronが提供する主要APIを実際に操作しながら学べるPlaygroundアプリです。ダークテーマのカード形式UIで、12種類の機能をボタンクリックで試すことができます。
 
 ## 動作環境
 
@@ -37,7 +37,7 @@ electron-test/
 | ファイル | プロセス | 説明 |
 |----------|----------|------|
 | `main.js` | Main | ウィンドウ作成、IPCハンドラ登録、メニュー構築、トレイ管理 |
-| `preload.js` | Preload | `contextBridge.exposeInMainWorld` でRenderer向けAPIを安全に公開 |
+| `preload.js` | Preload | `contextBridge.exposeInMainWorld` でRenderer向けAPIを安全に公開 (`webUtils` 含む) |
 | `index.html` | Renderer | UIレイアウト・スタイル定義 (カードグリッド、ダークテーマ) |
 | `renderer.js` | Renderer | ボタンイベント処理、結果表示ロジック |
 
@@ -137,6 +137,20 @@ electron-test/
 - **内容**: デスクトップ画面とウィンドウのサムネイルをキャプチャ
 - **操作**: "Capture Screens" で利用可能なソースの一覧とサムネイルを表示
 
+### 11. Drag & Drop
+- **使用API**: `webUtils.getPathForFile`, `fs.readFileSync` (IPC経由)
+- **内容**: ファイルをドロップゾーンにドラッグ＆ドロップし、ファイル情報と内容を表示
+- **操作**: ファイルをドロップゾーンにドラッグ＆ドロップ
+  - ファイル名・サイズ・タイプを表示
+  - テキストファイルの内容をプレビュー (500文字まで)
+
+### 12. Web Browser
+- **使用API**: `BrowserWindow`, `webContents.executeJavaScript`
+- **内容**: URLを入力してBrowserWindowで開き、ページのDOMを取得して表示
+- **操作**:
+  - URLを入力して "Open" — 新しいBrowserWindowでページを開く
+  - "Get DOM" — 開いているページのDOM (outerHTML) を取得して結果エリアに表示
+
 ## IPC チャンネル一覧
 
 | チャンネル名 | 方向 | 説明 |
@@ -152,6 +166,8 @@ electron-test/
 | `fs:writeFile` | Renderer → Main | ファイル書き込み |
 | `window:openChild` | Renderer → Main | 子ウィンドウ生成 |
 | `capture:screen` | Renderer → Main | 画面キャプチャ |
+| `browser:open` | Renderer → Main | URLをBrowserWindowで開く |
+| `browser:getDom` | Renderer → Main | ブラウザウィンドウのDOM取得 |
 | `menu-action` | Main → Renderer | メニュー操作の通知 |
 
 ## UI
