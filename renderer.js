@@ -290,6 +290,53 @@ $("btn-shell-show-folder").addEventListener("click", async () => {
   }
 });
 
+// #16 Network Request
+$("btn-net-send").addEventListener("click", async () => {
+  const url = $("net-url").value.trim();
+  if (!url) {
+    setResult("result-net", "Please enter a URL.");
+    return;
+  }
+
+  const method = $("net-method").value;
+  const headersStr = $("net-headers").value.trim();
+
+  let headers = {};
+  if (headersStr && headersStr !== "{}") {
+    try {
+      headers = JSON.parse(headersStr);
+    } catch {
+      setResult("result-net", "Invalid JSON in headers field.");
+      return;
+    }
+  }
+
+  const body = $("net-body").value;
+
+  setResult("result-net", "Sending...");
+  const result = await api.netRequest({ url, method, headers, body });
+  if (result.success) {
+    const headerLines = Object.entries(result.headers)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join("\n");
+    const bodyPreview =
+      result.body.length > 2000
+        ? result.body.substring(0, 2000) + "\n... (truncated)"
+        : result.body;
+    setResult(
+      "result-net",
+      `Status: ${result.status} ${result.statusText}\n\n--- Headers ---\n${headerLines}\n\n--- Body ---\n${bodyPreview}`
+    );
+  } else {
+    setResult("result-net", `Error: ${result.error}`);
+  }
+});
+
+$("btn-net-online").addEventListener("click", async () => {
+  const result = await api.netIsOnline();
+  setResult("result-net", result.online ? "Online" : "Offline");
+});
+
 // #15 Monaco Editor
 $("btn-editor-open").addEventListener("click", async () => {
   try {

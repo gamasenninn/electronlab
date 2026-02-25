@@ -33,13 +33,13 @@ test("header displays app name", async () => {
   expect(headerText).toBe("Electron Lab");
 });
 
-test("all 15 feature cards are present", async () => {
+test("all 16 feature cards are present", async () => {
   const cards = page.locator(".card");
-  await expect(cards).toHaveCount(15);
+  await expect(cards).toHaveCount(16);
 });
 
 test("each card has a number badge", async () => {
-  for (let i = 1; i <= 15; i++) {
+  for (let i = 1; i <= 16; i++) {
     const badge = page.locator(`.card-number`).filter({ hasText: new RegExp(`^${i}$`) });
     await expect(badge).toBeVisible();
   }

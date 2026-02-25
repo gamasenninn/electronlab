@@ -47,6 +47,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
       callback(accelerator)
     ),
 
+  // Network Request
+  netRequest: (opts) => ipcRenderer.invoke("net:request", opts),
+  netIsOnline: () => ipcRenderer.invoke("net:isOnline"),
+
   // Shell Integration
   shellOpenExternal: (url) => ipcRenderer.invoke("shell:openExternal", url),
   shellOpenPath: (filePath) => ipcRenderer.invoke("shell:openPath", filePath),

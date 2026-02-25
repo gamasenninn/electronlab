@@ -478,6 +478,31 @@
           <div class="result" id="result-editor"></div>
         </div>
       </div>
+
+      <!-- #16 Network Request -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-number">16</div>
+          <span class="card-title">Network Request</span>
+          <span class="card-api">net</span>
+        </div>
+        <div class="card-body">
+          <div class="input-row">
+            <input type="text" id="net-url" placeholder="https://httpbin.org/get" value="https://httpbin.org/get" />
+            <select id="net-method">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+            </select>
+          </div>
+          <textarea id="net-headers" placeholder='e.g. {"Content-Type": "application/json"}'>{}</textarea>
+          <textarea id="net-body" placeholder='e.g. {"name": "Electron", "version": 40}'></textarea>
+          <div class="card-actions">
+            <button id="btn-net-send">Send Request</button>
+            <button id="btn-net-online">Check Online</button>
+          </div>
+          <div class="result" id="result-net"></div>
+        </div>
+      </div>
     </div>
 
     <script src="renderer.js"></script>

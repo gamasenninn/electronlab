@@ -12,6 +12,7 @@ const {
   screen,
   globalShortcut,
   shell,
+  net,
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -412,6 +413,51 @@ ipcMain.handle("shell:showItemInFolder", (_, filePath) => {
   } catch (err) {
     return { success: false, error: err.message };
   }
+});
+
+// #16 Network Request (net)
+ipcMain.handle("net:request", (_, { url, method, headers, body }) => {
+  return new Promise((resolve) => {
+    try {
+      const request = net.request({ method: method || "GET", url });
+
+      if (headers && typeof headers === "object") {
+        for (const [key, value] of Object.entries(headers)) {
+          request.setHeader(key, value);
+        }
+      }
+
+      request.on("response", (response) => {
+        const chunks = [];
+        response.on("data", (chunk) => chunks.push(chunk.toString()));
+        response.on("end", () => {
+          const rawHeaders = response.headers || {};
+          resolve({
+            success: true,
+            status: response.statusCode,
+            statusText: response.statusMessage || "",
+            headers: rawHeaders,
+            body: chunks.join(""),
+          });
+        });
+      });
+
+      request.on("error", (err) => {
+        resolve({ success: false, error: err.message });
+      });
+
+      if (body) {
+        request.write(body);
+      }
+      request.end();
+    } catch (err) {
+      resolve({ success: false, error: err.message });
+    }
+  });
+});
+
+ipcMain.handle("net:isOnline", () => {
+  return { online: net.isOnline() };
 });
 
 // =========== App Lifecycle ===========
